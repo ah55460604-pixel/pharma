@@ -2214,7 +2214,7 @@ flushPending();
         const t = -2 + i / 64 * (Math.PI * 2 + .55), w = 1 + Math.sin(i * .8) * .025 + i / 64 * .05;
         d += (i ? ' L' : 'M') + (cx + Math.cos(t) * rx * w).toFixed(1) + ' ' + (cy + Math.sin(t) * ry * w).toFixed(1);
       }
-      svg.querySelector('.wk-c').setAttribute('d', d);
+      svg.querySelector('.wk-c').setAttribute('d', '');
       const lx = Math.min(innerWidth - 90, cx + rx * 1.25), ly = cy + ry * 1.05;
       lab.style.left = lx + 'px'; lab.style.top = ly + 'px';
       const sx = lx - 4, sy = ly - 6, ex = cx + rx * Math.cos(.7) * 1.08, ey = cy + ry * Math.sin(.7) * 1.08;
@@ -2234,7 +2234,7 @@ flushPending();
     function add(x, y, dirX) {
       const w = (24 + Math.random() * 9) * k, h = w * .42, el = document.createElement('div'); el.className = 'pill';
       el.style.width = w + 'px'; el.style.height = h + 'px'; el.innerHTML = capSvg(pickOne(CAPS)); document.body.appendChild(el);
-      pills.push({ el, w, h, x, y: y + (Math.random() - .5) * 10 * k, vx: dirX * (180 + Math.random() * 560) * k, vy: -(60 + Math.random() * 420) * k,
+      pills.push({ el, w, h, x, y: y + (Math.random() - .5) * 10 * k, vx: dirX * (110 + Math.random() * 300) * k, vy: -(50 + Math.random() * 230) * k,
                    rot: (Math.random() - .5) * 50, vr: (Math.random() - .5) * 1100, ground: false });
     }
     function tick(t) {
@@ -2246,7 +2246,7 @@ flushPending();
           p.y = floor - p.h / 2;
           if (p.vy > 0) { if (p.vy > 140 * k) { p.vy = -p.vy * .36; p.vx *= .8; p.vr *= .5; } else { p.vy = 0; p.ground = true; } }
         }
-        if (p.ground) { p.vx *= Math.max(0, 1 - 2.6 * dt); const tg = Math.round(p.rot / 180) * 180; p.rot += (tg - p.rot) * Math.min(1, 9 * dt); p.vr = 0; }
+        if (p.ground) { p.vx *= Math.max(0, 1 - 3.4 * dt); const tg = Math.round(p.rot / 180) * 180; p.rot += (tg - p.rot) * Math.min(1, 9 * dt); p.vr = 0; }
         else p.rot += p.vr * dt;
         if (p.x < p.w / 2) { p.x = p.w / 2; p.vx = Math.abs(p.vx) * .55; }
         if (p.x > W - p.w / 2) { p.x = W - p.w / 2; p.vx = -Math.abs(p.vx) * .55; }
@@ -2266,9 +2266,9 @@ flushPending();
     await wait(80);
     const B = SVG.querySelector('.ph-out').getBoundingClientRect();
     const F = B.bottom, k = B.height / 160, Cx = B.left + B.width / 2, Cy = B.top + B.height / 2;
-    const bh = B.height * .98, bw = bh / 1.68, bx = Cx - bw / 2, by = F - bh;
+    const mX = Cx - 12 * k, bh = Math.min(B.height * .98, (mX - 10) / 1.47), bw = bh / 1.68, bx = mX - bh * (1 - 26 / 168) - bw, by = F - bh;
     const wrap = document.createElement('div'); wrap.className = 'pb-wrap idle'; wrap.innerHTML = BOTTLE_SVG;
-    Object.assign(wrap.style, { left: bx + 'px', top: by + 'px', width: bw + 'px', height: bh + 'px', transformOrigin: '0% 100%' });
+    Object.assign(wrap.style, { left: bx + 'px', top: by + 'px', width: bw + 'px', height: bh + 'px', transformOrigin: '100% 100%' });
     document.body.appendChild(wrap);
     const sh = document.createElement('div'); sh.className = 'pb-shadow';
     Object.assign(sh.style, { left: bx - bw * .1 + 'px', top: F - 5 + 'px', width: bw * 1.2 + 'px' }); document.body.appendChild(sh);
@@ -2290,54 +2290,54 @@ flushPending();
     wrap.animate([
       { transform: 'none', easing: 'cubic-bezier(.3,0,.4,1)' },
       { transform: 'scale(1.05, .92)', offset: .12, easing: 'cubic-bezier(.3,0,.4,1)' },
-      { transform: 'rotate(-6deg) scale(.98, 1.03)', offset: .24, easing: 'cubic-bezier(.55,0,.9,.55)' },
-      { transform: 'rotate(-90deg)', offset: HIT, easing: 'cubic-bezier(.2,.7,.4,1)' },
-      { transform: 'rotate(-81deg)', offset: .72, easing: 'cubic-bezier(.6,0,.9,.6)' },
-      { transform: 'rotate(-90deg)', offset: .84, easing: 'cubic-bezier(.2,.7,.4,1)' },
-      { transform: 'rotate(-87deg)', offset: .92 },
-      { transform: 'rotate(-90deg)' }
+      { transform: 'rotate(-4deg) scale(.98, 1.03)', offset: .24, easing: 'cubic-bezier(.55,0,.9,.55)' },
+      { transform: 'rotate(90deg)', offset: HIT, easing: 'cubic-bezier(.2,.7,.4,1)' },
+      { transform: 'rotate(81deg)', offset: .72, easing: 'cubic-bezier(.6,0,.9,.6)' },
+      { transform: 'rotate(90deg)', offset: .84, easing: 'cubic-bezier(.2,.7,.4,1)' },
+      { transform: 'rotate(87deg)', offset: .92 },
+      { transform: 'rotate(90deg)' }
     ], { duration: FALL, fill: 'forwards' });
-    sh.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${-bh * .45}px) scaleX(${bh / bw * .9})`, opacity: .8 }], { duration: FALL * HIT, delay: FALL * .24, easing: 'cubic-bezier(.55,0,.9,.55)', fill: 'forwards' });
+    sh.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${bh * .45}px) scaleX(${bh / bw * .9})`, opacity: .8 }], { duration: FALL * HIT, delay: FALL * .24, easing: 'cubic-bezier(.55,0,.9,.55)', fill: 'forwards' });
     await W(FALL * HIT); if (!st.stage || st.leaving) return;
     sfx('pop'); STAGE.querySelector('.st-in')?.classList.add('shake');
-    dust(bx - bh * .5, F - 2, k, 14);
-    const mx = bx - bh * (1 - 26 / 168), my = F - bw / 2;
+    dust(bx + bw + bh * .5, F - 2, k, 14);
+    const mx = mX, my = F - bw / 2;
     { // the cap pops off and tumbles away
       const capEl = wrap.querySelector('.pb-cap'), cr = capEl.getBoundingClientRect(); capEl.style.opacity = '0';
       const fw = bw * .56, fh = bh * .155, fly = document.createElement('div'); fly.className = 'pb-fly'; fly.innerHTML = CAP_ONLY;
       Object.assign(fly.style, { width: fw + 'px', height: fh + 'px' }); document.body.appendChild(fly);
-      const x0 = cr.left + cr.width / 2 - fw / 2, y0 = cr.top + cr.height / 2 - fh / 2, gx = Math.max(6, x0 - 120 * k), gy = F - fh * .5 - fw / 2;
+      const x0 = cr.left + cr.width / 2 - fw / 2, y0 = cr.top + cr.height / 2 - fh / 2, gx = Math.min(innerWidth - fw - 6, x0 + 95 * k), gy = F - fh * .5 - fw / 2;
       fly.animate([
-        { transform: `translate(${x0}px, ${y0}px) rotate(-90deg)`, easing: 'cubic-bezier(.2,.6,.4,1)' },
-        { transform: `translate(${x0 - 60 * k}px, ${y0 - 90 * k}px) rotate(-300deg)`, offset: .35, easing: 'cubic-bezier(.5,0,.8,.4)' },
-        { transform: `translate(${gx}px, ${gy}px) rotate(-450deg)`, offset: .7, easing: 'cubic-bezier(.2,.6,.4,1)' },
-        { transform: `translate(${gx - 10 * k}px, ${gy - 16 * k}px) rotate(-470deg)`, offset: .82, easing: 'cubic-bezier(.5,0,.8,.4)' },
-        { transform: `translate(${gx - 16 * k}px, ${gy}px) rotate(-450deg)` }
+        { transform: `translate(${x0}px, ${y0}px) rotate(90deg)`, easing: 'cubic-bezier(.2,.6,.4,1)' },
+        { transform: `translate(${x0 + 50 * k}px, ${y0 - 80 * k}px) rotate(300deg)`, offset: .35, easing: 'cubic-bezier(.5,0,.8,.4)' },
+        { transform: `translate(${gx}px, ${gy}px) rotate(450deg)`, offset: .7, easing: 'cubic-bezier(.2,.6,.4,1)' },
+        { transform: `translate(${gx + 8 * k}px, ${gy - 14 * k}px) rotate(470deg)`, offset: .82, easing: 'cubic-bezier(.5,0,.8,.4)' },
+        { transform: `translate(${gx + 12 * k}px, ${gy}px) rotate(450deg)` }
       ], { duration: 1100 * T, fill: 'forwards' });
       microSparks(mx, my, c, 10);
     }
     const eng = spillEngine(F, k); st.spill = eng;
-    for (let i = 0; i < 6; i++) eng.add(mx, my, -1);
-    let n = 0; const pour = setInterval(() => { if (!st.spill || n++ > 12) return clearInterval(pour); eng.add(mx, my, Math.random() < .85 ? -1 : 1); if (n % 3 === 0) sfx('pop'); }, 55 * T);
+    for (let i = 0; i < 6; i++) eng.add(mx, my, 1);
+    let n = 0; const pour = setInterval(() => { if (!st.spill || n++ > 12) return clearInterval(pour); eng.add(mx, my, 1); if (n % 3 === 0) sfx('pop'); }, 55 * T);
     await W(240); if (!st.stage || st.leaving) return;
     const hero = document.createElement('div'); hero.className = 'pill'; hero.style.zIndex = 78; hero.innerHTML = HERO_SVG;
     Object.assign(hero.style, { left: B.left + 'px', top: B.top + 'px', width: B.width + 'px', height: B.height + 'px', transformOrigin: '50% 50%' });
     document.body.appendChild(hero);
     const hw = B.width, hh = B.height, S1 = .5, L = F - hw * S1 / 2 - Cy, ox = mx - Cx, oy = my - Cy;
-    const X1 = Math.max(-Cx + hh * S1 / 2 + 10, ox - 105 * k), X2 = Math.max(-Cx + hh * S1 / 2 + 6, X1 - 14 * k);
+    const lim = innerWidth - Cx - hh * S1 / 2 - 10, X1 = Math.min(lim, ox + 110 * k), X2 = Math.min(lim + 4, X1 + 14 * k);
     const tf = (x, y, r, sx = 1, sy = sx) => `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${r}deg) scale(${sx}, ${sy})`;
     const UP = 'cubic-bezier(.2,.6,.4,1)', DOWN = 'cubic-bezier(.55,0,.85,.45)', SOFT = 'cubic-bezier(.4,0,.2,1)';
     const HERO = 3300 * T;
     hero.animate([
-      { transform: tf(ox + 8 * k, oy, -90, .28), opacity: 0, easing: UP },
-      { transform: tf(ox - 26 * k, oy - 52 * k, -170, S1), opacity: 1, offset: .1, easing: DOWN },
-      { transform: tf(X1, L, -270, S1), offset: .21, easing: SOFT },
-      { transform: tf(X1, L, -270, S1 * 1.04, S1 * .9), offset: .24, easing: UP },
-      { transform: tf(X1 - 8 * k, L - 20 * k, -278, S1), offset: .29, easing: DOWN },
-      { transform: tf(X2, L, -270, S1), offset: .34, easing: SOFT },
-      { transform: tf(X2, L, -270, S1), offset: .52, easing: SOFT },
-      { transform: tf(X2 + 3 * k, L, -262, S1 * 1.03, S1 * .94), offset: .58, easing: UP },
-      { transform: tf(X2 / 2, -112 * k, -135, .82), offset: .76, easing: DOWN },
+      { transform: tf(ox - 8 * k, oy, 90, .28), opacity: 0, easing: UP },
+      { transform: tf(ox + 26 * k, oy - 52 * k, 170, S1), opacity: 1, offset: .1, easing: DOWN },
+      { transform: tf(X1, L, 270, S1), offset: .21, easing: SOFT },
+      { transform: tf(X1, L, 270, S1 * 1.04, S1 * .9), offset: .24, easing: UP },
+      { transform: tf(X1 + 8 * k, L - 20 * k, 278, S1), offset: .29, easing: DOWN },
+      { transform: tf(X2, L, 270, S1), offset: .34, easing: SOFT },
+      { transform: tf(X2, L, 270, S1), offset: .52, easing: SOFT },
+      { transform: tf(X2 - 3 * k, L, 262, S1 * 1.03, S1 * .94), offset: .58, easing: UP },
+      { transform: tf(X2 / 2, -112 * k, 135, .82), offset: .76, easing: DOWN },
       { transform: tf(0, 0, 0, 1.1, .86), offset: .9, easing: UP },
       { transform: tf(0, -6 * k, 0, .95, 1.07), offset: .95, easing: SOFT },
       { transform: tf(0, 0, 0) }
@@ -2345,7 +2345,7 @@ flushPending();
     setTimeout(() => sfx('pop'), HERO * .21);
     setTimeout(() => { if (!st.stage) return;
       const r = wrap.getBoundingClientRect(); microSparks(r.left + r.width / 2, r.top + r.height / 2, c, 16); asmRing(r.left + r.width / 2, r.top + r.height / 2, r.width * 1.1, c, 700);
-      wrap.animate([{ opacity: 1, transform: 'rotate(-90deg)' }, { opacity: 0, transform: 'rotate(-90deg) scale(.4)' }], { duration: 420, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' });
+      wrap.animate([{ opacity: 1, transform: 'rotate(90deg)' }, { opacity: 0, transform: 'rotate(90deg) scale(.4)' }], { duration: 420, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' });
       sh.animate([{ opacity: .8 }, { opacity: 0 }], { duration: 400, fill: 'forwards' }); sfx('streak');
     }, HERO * .4);
     setTimeout(() => sfx('whoosh'), HERO * .58);
