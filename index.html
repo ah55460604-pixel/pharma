@@ -12,9 +12,6 @@
     display: ['Fraunces', 'Georgia', 'serif'], mono: ['Quicksand', 'sans-serif'],
     sans: ['Quicksand', 'system-ui', 'sans-serif'], ar: ['"Baloo Bhaijaan 2"', 'Cairo', 'sans-serif'] } } } };
 </script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
   
   body {
@@ -190,8 +187,37 @@
         </button>
         <button type="button" class="tile" style="--c:var(--acc);min-height:auto" data-mode="sim">
           <div class="font-semibold">🎓 Exam simulation</div>
-          <div class="nm mt-1">32 random MCQs + 2 random written questions, all from the bank</div>
+          <div class="nm mt-1">You choose the number of MCQs and written questions, and the lectures</div>
         </button>
+      </div>
+    </div>
+
+    <div id="secSim" class="hidden">
+      <div class="panel2 p-4 sm:p-5" style="border:1.5px dashed var(--accLine);border-radius:22px">
+        <div class="label mb-2">Number of MCQs</div>
+        <div class="flex flex-wrap gap-2 items-center" id="simMcqChips">
+          <button type="button" class="chip" data-simm="10">10</button><button type="button" class="chip" data-simm="20">20</button>
+          <button type="button" class="chip" data-simm="32">32</button><button type="button" class="chip" data-simm="40">40</button>
+          <button type="button" class="chip" data-simm="50">50</button><button type="button" class="chip" data-simm="0">0</button>
+          <input id="simMcqIn" type="number" min="0" inputmode="numeric" placeholder="Type a number" class="px-3 py-2 text-sm w-36" style="border-radius:999px">
+          <span class="text-xs muted" id="simMcqMax"></span>
+        </div>
+        <div class="label mt-5 mb-2">Number of written questions</div>
+        <div class="flex flex-wrap gap-2 items-center" id="simEssChips">
+          <button type="button" class="chip" data-sime="0">0</button><button type="button" class="chip" data-sime="1">1</button>
+          <button type="button" class="chip" data-sime="2">2</button><button type="button" class="chip" data-sime="3">3</button>
+          <button type="button" class="chip" data-sime="5">5</button>
+          <span class="text-xs muted" id="simEssMax"></span>
+        </div>
+        <div class="label mt-5 mb-2">From which lectures</div>
+        <div class="flex flex-wrap gap-2" id="simScopeChips"></div>
+        <div class="label mt-5 mb-2">MCQs from</div>
+        <div class="flex flex-wrap gap-2" id="simSrcChips">
+          <button type="button" class="chip" data-simsrc="both">📘 Bank + Formatives</button>
+          <button type="button" class="chip" data-simsrc="bank">📗 Question bank only</button>
+          <button type="button" class="chip" data-simsrc="form">📝 Formatives only</button>
+        </div>
+        <p class="ar text-sm mt-4 muted text-right">🎓 اختاري عدد الأسئلة الاختياري والمقالي ومن أنهي محاضرات — والمقالي بييجي في آخر الامتحان زي الحقيقي.</p>
       </div>
     </div>
 
@@ -357,73 +383,14 @@
   </div>
 </section>
 
-<section id="view-admin" class="hidden-view">
-  <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
-    <div>
-      <div class="label mb-1" style="color:var(--acc)">Admin</div>
-      <h1 class="font-display text-3xl font-bold">Results Dashboard</h1>
-      <p class="muted text-sm mt-1" id="adminMode"></p>
-    </div>
-    <div class="flex gap-2">
-      <button id="exportCsv" class="btn btn-ghost text-sm py-2">Export CSV</button>
-      <button id="adminLogout" class="btn btn-acc text-sm py-2">Lock &amp; exit</button>
-    </div>
-  </div>
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-    <div class="panel2 p-4"><div class="label">Test-takers</div><div class="font-mono text-3xl font-bold" id="stTakers">0</div><div class="text-xs muted">unique students/devices</div></div>
-    <div class="panel2 p-4"><div class="label">Attempts</div><div class="font-mono text-3xl font-bold" id="stAttempts">0</div><div class="text-xs muted">exams submitted</div></div>
-    <div class="panel2 p-4"><div class="label">Average</div><div class="font-mono text-3xl font-bold" id="stAvg">–</div><div class="text-xs muted">mean percentage</div></div>
-    <div class="panel2 p-4"><div class="label">Pass rate</div><div class="font-mono text-3xl font-bold" id="stPass">–</div><div class="text-xs muted">scored ≥ 50%</div></div>
-  </div>
-  <div class="grid grid-cols-3 gap-3 mb-6">
-    <div class="panel2 p-4"><div class="label">👦 Boys</div><div class="font-mono text-3xl font-bold" style="color:#60a5fa" id="stBoys">0</div><div class="text-xs muted" id="stBoysA">0 attempts</div></div>
-    <div class="panel2 p-4"><div class="label">👧 Girls</div><div class="font-mono text-3xl font-bold" style="color:#f0a6c5" id="stGirls">0</div><div class="text-xs muted" id="stGirlsA">0 attempts</div></div>
-    <div class="panel2 p-4"><div class="label">⚗️ Not specified</div><div class="font-mono text-3xl font-bold" id="stNone">0</div><div class="text-xs muted" id="stNoneA">0 attempts</div></div>
-  </div>
-  <div class="panel overflow-hidden">
-    <div class="p-4 border-b flex flex-wrap gap-3 items-center justify-between" style="border-color:var(--line)">
-      <input id="adminSearch" placeholder="Search by name or student ID…" class="px-3 py-2 text-sm w-full sm:w-72">
-      <div class="flex items-center gap-2 text-xs muted"><span class="w-2 h-2 rounded-full animate-pulse" style="background:var(--acc)"></span> Live updates</div>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="text-left label"><tr>
-          <th class="px-4 py-3">#</th><th class="px-4 py-3">Name</th><th class="px-4 py-3">Student ID</th><th class="px-4 py-3">Gender</th><th class="px-4 py-3">Date &amp; time</th>
-          <th class="px-4 py-3">Lecture</th><th class="px-4 py-3">Difficulty</th><th class="px-4 py-3 text-right">Score</th><th class="px-4 py-3 text-right">%</th>
-        </tr></thead>
-        <tbody id="adminRows"></tbody>
-      </table>
-    </div>
-    <div id="adminEmpty" class="p-10 text-center muted hidden">No results yet.</div>
-  </div>
-</section>
+<section id="view-admin" class="hidden-view"></section>
 </main>
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-50 opacity-0 pointer-events-none translate-y-4">
   <div class="ar px-6 py-3 rounded-2xl font-bold text-lg shadow-2xl" style="background:var(--amber);color:var(--amberInk)" id="toastText"></div>
 </div>
 
-<div id="codeBox" class="hidden fixed inset-0 z-50 grid place-items-center p-4" style="background:var(--overlay)">
-  <div class="panel w-full max-w-xs p-5 fade">
-    <input id="codeInput" type="password" autocomplete="off" placeholder="Code" class="w-full px-4 py-3">
-    <p id="codeErr" class="text-sm mt-2 hidden" style="color:var(--rose)">Invalid code.</p>
-    <button id="codeGo" class="btn btn-acc w-full mt-3">OK</button>
-  </div>
-</div>
-
 <script>
-
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCJqfG042jw_bA3L_6vdMYja11re16Cx48",
-  authDomain: "bioc209-exam.firebaseapp.com",
-  projectId: "bioc209-exam",
-  storageBucket: "bioc209-exam.firebasestorage.app",
-  messagingSenderId: "877329298616",
-  appId: "1:877329298616:web:17e96833f8c3bd257c704d"
-};
-const ADMIN_EMAIL = "admin@bioc209.app";
-const COLLECTION  = "pharm_results";
-const PASS_HASH   = "c65fee33c7c6897d28bbb7128cbc38f79f56f8d2c71f98cb3c9a26e8ca0618cf"; // SHA-256 of the code
 const LECTURE_SHARE = 0.12;
 
 const QUESTIONS = [
@@ -798,7 +765,34 @@ const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
 const scopeOf = (k) => SCOPES.find(s => s.key === k) || SCOPES[0];
 const diffLabel = (k) => k === 'mixed' ? 'Mixed' : ((DIFFS.find(d => d.key === k) || {}).label || k);
-const SIM_MCQ = 32, SIM_ESSAY = 2;
+let SIM_MCQ = 32, SIM_ESSAY = 2;
+const SIM = { mcq: 32, ess: 2, scopes: [], src: 'both' };
+try { const v = JSON.parse(localStorage.getItem('phx_sim') || 'null'); if (v) Object.assign(SIM, v); } catch {}
+const simSave = () => { try { localStorage.setItem('phx_sim', JSON.stringify(SIM)); } catch {} };
+const simScopeOk = (q) => !SIM.scopes.length || SIM.scopes.includes(q.scope);
+const simSrcOk = (q) => SIM.src === 'both' || (SIM.src === 'bank' ? /^Bank/.test(q.tag) : /^Formative/.test(q.tag));
+function simMcqPool() { const seen = new Set(), out = []; for (const q of shuffle(QUESTIONS.filter(q => q.src === 'bank' && q.type === 'mcq' && simScopeOk(q) && simSrcOk(q)))) { if (q.g && seen.has(q.g)) continue; if (q.g) seen.add(q.g); out.push(q); } return out; }
+const simEssPool = () => QUESTIONS.filter(q => q.type === 'essay' && simScopeOk(q));
+function simClamp() { const mm = simMcqPool().length, me = simEssPool().length; SIM_MCQ = Math.min(SIM.mcq, mm); SIM_ESSAY = Math.min(SIM.ess, me); if (!SIM_MCQ && !SIM_ESSAY) SIM_MCQ = Math.min(10, mm); return { mm, me }; }
+function renderSim() {
+  const { mm, me } = simClamp();
+  $('simScopeChips').innerHTML = [{ key: '', label: 'All lectures' }].concat(SCOPES.filter(x => x.key !== 'ALL')).map(x =>
+    `<button type="button" class="chip ${(!x.key && !SIM.scopes.length) || SIM.scopes.includes(x.key) ? 'on' : ''}" data-sims="${x.key}">${esc(x.label)}${x.sub ? ` <span class="opacity-70 text-xs">· ${esc(x.sub)}</span>` : ''}</button>`).join('');
+  document.querySelectorAll('[data-simm]').forEach(b => b.classList.toggle('on', +b.dataset.simm === SIM.mcq));
+  document.querySelectorAll('[data-sime]').forEach(b => { b.classList.toggle('on', +b.dataset.sime === SIM.ess); b.disabled = +b.dataset.sime > me; b.style.opacity = +b.dataset.sime > me ? .35 : ''; });
+  document.querySelectorAll('[data-simsrc]').forEach(b => b.classList.toggle('on', b.dataset.simsrc === SIM.src));
+  $('simMcqMax').textContent = `max ${mm}`; $('simEssMax').textContent = `max ${me}`;
+}
+$('secSim').addEventListener('click', (e) => {
+  const m = e.target.closest('[data-simm]'), es = e.target.closest('[data-sime]'), sc = e.target.closest('[data-sims]'), sr = e.target.closest('[data-simsrc]');
+  if (m) { SIM.mcq = +m.dataset.simm; $('simMcqIn').value = ''; }
+  else if (es) SIM.ess = +es.dataset.sime;
+  else if (sc) { const k = sc.dataset.sims; if (!k) SIM.scopes = []; else { SIM.scopes = SIM.scopes.includes(k) ? SIM.scopes.filter(x => x !== k) : SIM.scopes.concat(k); if (SIM.scopes.length === SCOPES.length - 1) SIM.scopes = []; } }
+  else if (sr) SIM.src = sr.dataset.simsrc;
+  else return;
+  simSave(); renderSetup();
+});
+$('simMcqIn').addEventListener('input', () => { const v = parseInt($('simMcqIn').value, 10); if (v >= 0) { SIM.mcq = v; simSave(); renderSetup(); } });
 const poolFor = (scope) => QUESTIONS.filter(q => (scope === 'ALL' || q.scope === scope) && (
   setup.mode === 'essay' ? (q.type === 'essay' && q.src === 'bank') : ((setup.mode !== 'mcq' || q.type === 'mcq') && (setup.source !== 'bank' || q.src === 'bank'))));
 function showView(name) {
@@ -873,13 +867,7 @@ const SFX = (() => {
   };
 })();
 
-const FB_ENABLED = !!FIREBASE_CONFIG.apiKey;
-let db = null, auth = null;
-if (FB_ENABLED) {
-  try { firebase.initializeApp(FIREBASE_CONFIG); db = firebase.firestore(); auth = firebase.auth();
-        auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(() => {}); }
-  catch (e) { console.error('Firebase init failed', e); }
-}
+const FB_ENABLED = false; const db = null;
 const LOCAL_KEY = 'phx_demo_results', PENDING_KEY = 'phx_pending';
 const lsGet = (k) => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch { return []; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
@@ -923,7 +911,9 @@ function renderSetup() {
   $('secCount').classList.toggle('hidden', setup.mode === 'sim');
   $('secSource').classList.toggle('hidden', setup.mode !== 'custom' && setup.mode !== 'mcq');
   $('secDiff').classList.toggle('hidden', setup.mode !== 'custom' && setup.mode !== 'mcq');
-  if (setup.mode === 'sim') { $('summary').innerHTML = `🎓 Exam simulation · <span class="font-mono">${SIM_MCQ}</span> MCQs + <span class="font-mono">${SIM_ESSAY}</span> short-answer · random from the whole bank`; return; }
+  $('secSim').classList.toggle('hidden', setup.mode !== 'sim');
+  if (setup.mode === 'sim') { renderSim(); const from = SIM.scopes.length ? SIM.scopes.map(k => scopeOf(k).label).join(' + ') : 'all lectures';
+    $('summary').innerHTML = `🎓 Exam simulation · <span class="font-mono">${SIM_MCQ}</span> MCQs + <span class="font-mono">${SIM_ESSAY}</span> written · ${esc(from)} · ${SIM.src === 'both' ? 'bank + formatives' : SIM.src === 'bank' ? 'question bank only' : 'formatives only'}`; return; }
   if (setup.mode === 'essay') { $('summary').innerHTML = `✍️ Short-answer only · <span class="font-mono">${setup.count}</span> questions · ${s.label}`; return; }
   $('summary').innerHTML = `${setup.source === 'bank' ? '📘 Bank only · ' : ''}<span class="font-mono">${setup.count}</span> questions · ${s.label}${s.key !== 'ALL' ? ' — ' + s.sub : ''} · ${setup.count >= max ? 'all levels' : diffLabel(setup.diff)}`;
 }
@@ -1010,11 +1000,8 @@ function prepareQs(list) {
   });
 }
 function buildSimulation() {
-  const seen = new Set(), mcq = [];
-  for (const q of shuffle(QUESTIONS.filter(q => q.src === 'bank' && q.type === 'mcq'))) {
-    if (mcq.length >= SIM_MCQ) break; if (q.g && seen.has(q.g)) continue; if (q.g) seen.add(q.g); mcq.push(q);
-  }
-  const essays = shuffle(QUESTIONS.filter(q => q.src === 'bank' && q.type === 'essay')).slice(0, SIM_ESSAY);
+  simClamp();
+  const mcq = simMcqPool().slice(0, SIM_MCQ), essays = shuffle(simEssPool()).slice(0, SIM_ESSAY);
   return [...prepareQs(mcq), ...prepareQs(essays)];
 }
 function buildExam(scope, count, diff) {
@@ -1249,7 +1236,7 @@ function finishExam() {
   $('resPct').style.color = pct >= 75 ? 'var(--acc)' : pct >= 50 ? 'var(--amber)' : 'var(--rose)';
   $('resScore').textContent = `${exam.score} / ${total} correct`;
   $('resMsg').textContent = msg;
-  const modeLabel = setup.mode === 'sim' ? `Exam simulation (${SIM_MCQ} MCQ + ${SIM_ESSAY} short-answer)` : setup.mode === 'essay' ? s.label + ' (short-answer only)' : s.label + (setup.mode === 'mcq' ? ' (MCQ only)' : '') + (setup.source === 'bank' ? ' (bank only)' : '');
+  const modeLabel = setup.mode === 'sim' ? `Exam simulation (${SIM_MCQ} MCQ + ${SIM_ESSAY} written)` : setup.mode === 'essay' ? s.label + ' (short-answer only)' : s.label + (setup.mode === 'mcq' ? ' (MCQ only)' : '') + (setup.source === 'bank' ? ' (bank only)' : '');
   $('resScope').textContent = setup.mode === 'sim' ? 'Exam simulation' : setup.mode === 'essay' ? s.label + ' · short-answer only' : s.label + (setup.mode === 'mcq' ? ' · MCQ only' : (s.key !== 'ALL' ? ' · ' + s.sub : ''));
   $('resDiff').textContent = (setup.mode !== 'custom' && setup.mode !== 'mcq') ? 'Mixed' : (total >= poolFor(setup.scope).length && !exam.isRetry ? 'All levels' : diffLabel(setup.diff));
   $('resTime').textContent = fmtTime(dur);
@@ -1279,8 +1266,7 @@ $('reviewToggle').onclick = () => { const h = $('reviewList').classList.toggle('
 $('restartBtn').onclick = () => { showView('setup'); renderSetup(); };
 
 async function sendOne(rec) {
-  if (FB_ENABLED && db) await db.collection(COLLECTION).add({ ...rec, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-  else { const arr = lsGet(LOCAL_KEY); arr.push({ ...rec, id: 'local-' + Date.now(), timestamp: rec.clientTime }); lsSet(LOCAL_KEY, arr); }
+  { const arr = lsGet(LOCAL_KEY); arr.push({ ...rec, id: 'local-' + Date.now(), timestamp: rec.clientTime }); lsSet(LOCAL_KEY, arr); }
 }
 async function saveResult(r) {
   const rec = { ...r, clientTime: new Date().toISOString() };
@@ -1294,79 +1280,6 @@ async function flushPending() {
   const p = lsGet(PENDING_KEY); if (!p.length) return;
   const left = []; for (const rec of p) { try { await sendOne(rec); } catch { left.push(rec); } } lsSet(PENDING_KEY, left);
 }
-
-let adminUnsub = null, adminRows = [], adminUnlocked = false;
-async function sha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
-let logoTaps = [];
-$('logo').addEventListener('click', () => {
-  const now = Date.now(); logoTaps = logoTaps.filter(t => now - t < 3000); logoTaps.push(now);
-  if (logoTaps.length >= 5) { logoTaps = []; openCodeBox(); }
-});
-function openCodeBox() { if (adminUnlocked) { openAdmin(); return; } $('codeInput').value = ''; $('codeErr').classList.add('hidden'); $('codeBox').classList.remove('hidden'); setTimeout(() => $('codeInput').focus(), 50); }
-const closeCodeBox = () => $('codeBox').classList.add('hidden');
-$('codeBox').addEventListener('click', e => { if (e.target === $('codeBox')) closeCodeBox(); });
-$('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('codeGo').click(); if (e.key === 'Escape') closeCodeBox(); });
-$('codeGo').onclick = async () => {
-  const pass = $('codeInput').value.trim(); $('codeGo').disabled = true;
-  try {
-    if (!pass || (await sha256(pass)) !== PASS_HASH) throw new Error('bad');
-    if (FB_ENABLED && auth) await auth.signInWithEmailAndPassword(ADMIN_EMAIL, pass);
-    adminUnlocked = true; closeCodeBox(); clearInterval(timerInt); openAdmin();
-  } catch (e) { if (e.message !== 'bad') console.error(e); $('codeErr').classList.remove('hidden'); }
-  finally { $('codeGo').disabled = false; }
-};
-if (location.hash === '#admin') { history.replaceState(null, '', location.pathname + location.search); setTimeout(openCodeBox, 300); }
-
-function openAdmin() {
-  showView('admin');
-  $('adminMode').textContent = FB_ENABLED && db ? 'Connected to Firebase — results appear in real time.' : 'Demo mode — showing results stored in this browser only.';
-  if (adminUnsub) return;
-  if (FB_ENABLED && db) {
-    adminUnsub = db.collection(COLLECTION).orderBy('timestamp', 'desc').onSnapshot(snap => {
-      adminRows = snap.docs.map(d => { const x = d.data(); return { ...x, ts: x.timestamp?.toDate ? x.timestamp.toDate() : new Date(x.clientTime || Date.now()) }; });
-      renderAdmin();
-    }, err => { $('adminMode').textContent = 'Permission denied or connection error: ' + (err.code || err.message); });
-  } else {
-    const load = () => { adminRows = lsGet(LOCAL_KEY).map(x => ({ ...x, ts: new Date(x.timestamp) })).sort((a, b) => b.ts - a.ts); renderAdmin(); };
-    load(); const on = e => { if (e.key === LOCAL_KEY) load(); }; window.addEventListener('storage', on); adminUnsub = () => window.removeEventListener('storage', on);
-  }
-}
-const nameOf = (r) => { if (r.name) return String(r.name); const s = String(r.studentName || ''); const i = s.indexOf(' · Student-'); return i > 0 ? s.slice(0, i) : ''; };
-const idOf = (r) => { const s = String(r.studentName || ''); const m = s.match(/Student-[A-Z0-9]{4}/); return m ? m[0] : 'Unknown'; };
-const genOf = (r) => r.gender === 'boy' || r.gender === 'girl' ? r.gender : 'none';
-const GEN_LABEL = { boy: '👦 Boy', girl: '👧 Girl', none: '<span class="muted">—</span>' };
-function renderAdmin() {
-  const term = $('adminSearch').value.trim().toLowerCase();
-  const rows = adminRows.filter(r => !term || idOf(r).toLowerCase().includes(term) || nameOf(r).toLowerCase().includes(term));
-  const latest = new Map(); adminRows.forEach(r => { if (!latest.has(idOf(r))) latest.set(idOf(r), genOf(r)); });
-  const cnt = { boy: 0, girl: 0, none: 0 }, att = { boy: 0, girl: 0, none: 0 };
-  latest.forEach(g => cnt[g]++); adminRows.forEach(r => att[genOf(r)]++);
-  $('stBoys').textContent = cnt.boy; $('stGirls').textContent = cnt.girl; $('stNone').textContent = cnt.none;
-  $('stBoysA').textContent = att.boy + ' attempts'; $('stGirlsA').textContent = att.girl + ' attempts'; $('stNoneA').textContent = att.none + ' attempts';
-  $('stTakers').textContent = latest.size; $('stAttempts').textContent = adminRows.length;
-  $('stAvg').textContent = adminRows.length ? (adminRows.reduce((a, r) => a + (+r.percentage || 0), 0) / adminRows.length).toFixed(1) + '%' : '–';
-  $('stPass').textContent = adminRows.length ? Math.round(adminRows.filter(r => r.percentage >= 50).length / adminRows.length * 100) + '%' : '–';
-  $('adminEmpty').classList.toggle('hidden', rows.length > 0);
-  $('adminRows').innerHTML = rows.map((r, i) => { const p = +r.percentage || 0;
-    return `<tr class="border-t">
-      <td class="px-4 py-3 muted font-mono">${i + 1}</td><td class="px-4 py-3 font-semibold" dir="auto">${nameOf(r) ? esc(nameOf(r)) : '<span class="muted">—</span>'}</td><td class="px-4 py-3 font-mono muted">${esc(idOf(r))}</td><td class="px-4 py-3">${GEN_LABEL[genOf(r)]}</td>
-      <td class="px-4 py-3 muted whitespace-nowrap">${esc(r.ts.toLocaleString())}</td><td class="px-4 py-3">${esc(r.scopeLabel || r.scope)}</td>
-      <td class="px-4 py-3">${esc(diffLabel(r.difficulty))}</td><td class="px-4 py-3 text-right font-mono">${esc(r.score)}/${esc(r.total)}</td>
-      <td class="px-4 py-3 text-right font-mono" style="color:${p >= 75 ? 'var(--acc)' : p >= 50 ? 'var(--amber)' : 'var(--rose)'}">${p}%</td></tr>`; }).join('');
-}
-$('adminSearch').addEventListener('input', renderAdmin);
-$('exportCsv').onclick = () => {
-  const cell = (v) => { let s = String(v ?? ''); if (/^[=+\-@]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; };
-  const lines = [['Name','Student ID','Gender','Date','Lecture','Difficulty','Score','Total','Percentage','Duration (s)'].map(cell).join(',')]
-    .concat(adminRows.map(r => [nameOf(r), idOf(r), genOf(r), r.ts.toISOString(), r.scopeLabel || r.scope, diffLabel(r.difficulty), r.score, r.total, r.percentage, r.durationSec].map(cell).join(',')));
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' }));
-  a.download = `pharm_results_${new Date().toISOString().slice(0, 10)}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-};
-$('adminLogout').onclick = async () => {
-  if (typeof adminUnsub === 'function') adminUnsub(); adminUnsub = null; adminRows = []; adminUnlocked = false; $('adminRows').innerHTML = '';
-  if (FB_ENABLED && auth) { try { await auth.signOut(); } catch {} }
-  showView('setup'); renderSetup();
-};
 
 ['homeBox', 'resetBox'].forEach(id => { const el = $(id); if (el) document.body.appendChild(el); });
 $('homeBtn').onclick = () => { if (exam && exam.answers && exam.answers.length) $('homeBox').classList.remove('hidden'); else goHome(); };
@@ -1419,8 +1332,8 @@ flushPending();
   #inlo.mood-happy .hap, #inlo.mood-happy .m-h, #inlo.mood-sleep .clo, #inlo.mood-sad .brow, #inlo.mood-sad .m-s,
   #inlo.mood-dizzy .xx, #inlo.mood-dizzy .m-o, #inlo.mood-wow .m-o { opacity: 1; }
   #inlo.look-girl .cheek { opacity: .75; }
-  #inlo .armL { transform-box: view-box; transform-origin: 38px 78px; animation: iArmL 2.6s ease-in-out infinite; transition: transform .5s; }
-  #inlo .armR { transform-box: view-box; transform-origin: 84px 76px; animation: iArmR 2.9s ease-in-out infinite; transition: transform .5s; }
+  #inlo .armL { transform-box: view-box; transform-origin: 39.1px 78.5px; animation: iArmL 2.6s ease-in-out infinite; transition: transform .5s; }
+  #inlo .armR { transform-box: view-box; transform-origin: 80.8px 74.2px; animation: iArmR 2.9s ease-in-out infinite; transition: transform .5s; }
   #inlo .wave .armR { animation: iWave .34s ease-in-out 8 alternate; }
   #inlo .cheer .armL { animation: iCheerL .3s ease-in-out 8 alternate; }
   #inlo .cheer .armR { animation: iCheerR .3s ease-in-out 8 alternate; }
@@ -1540,64 +1453,53 @@ flushPending();
   #madeBy { position: fixed; right: 10px; bottom: 8px; z-index: 96; pointer-events: none; user-select: none; direction: ltr;
             font: 600 11px/1 'Inter', sans-serif; letter-spacing: .02em; color: var(--text); opacity: .42; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
   
-  #inlo .ph-top { fill: #fff; stroke: var(--text); stroke-width: 3.4; stroke-linejoin: round; transition: stroke .5s; }
+  #inlo .ph-fillw { fill: #fff; }
   #inlo .ph-bot { fill: #f6a5c3; }
-  #inlo .ph-bot-o, #inlo .ph-seam { fill: none; stroke: var(--text); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; transition: stroke .5s; }
-  #inlo .ph-shine { fill: none; stroke: #f6d6e2; stroke-width: 3.2; stroke-linecap: round; opacity: .9; }
-  #inlo .ph-hand { fill: #fff; stroke: var(--text); stroke-width: 3; transition: stroke .5s; }
+  #inlo .ph-out, #inlo .ph-seam { fill: none; stroke: var(--text); stroke-width: 4.6; stroke-linejoin: round; transition: stroke .5s; }
+  #inlo .ph-arm { fill: none; stroke: var(--text); stroke-width: 2.4; stroke-linecap: round; transition: stroke .5s; }
+  #inlo .ph-hand { fill: #fff; stroke: var(--text); stroke-width: 2.3; transition: stroke .5s; }
+  #inlo .ph-ln { fill: none; stroke: var(--text); stroke-width: 4.6; stroke-linecap: round; stroke-linejoin: round; transition: stroke .5s; }
   #inlo .ph-lash path { fill: var(--text); transition: fill .5s; }
-  #inlo .ph-lash { transform-box: fill-box; transform-origin: 50% 100%; }
-  #inlo .eye-w { fill: url(#phEyeG); stroke: var(--text); stroke-width: 2.6; }
-  #inlo .cheek { opacity: .7; }
-  #inlo.mood-happy .ph-lash, #inlo.mood-sleep .ph-lash { transform: translateY(2px); }
-  #inlo .armL { transform-origin: 38px 78px; }
-  #inlo .armR { transform-origin: 84px 76px; }
-  #inlo .ghost { fill: none; stroke: var(--muted); stroke-width: 2.6; stroke-dasharray: 5 6; opacity: 0; transition: opacity .6s ease; pointer-events: none; }
+  #inlo .ph-lash { transform-box: fill-box; transform-origin: 0% 100%; }
+  #inlo .ph-ew { fill: #fff; stroke: var(--text); stroke-width: 4.2; transition: stroke .5s; }
+  #inlo .ph-rim { fill: none; stroke: #e9e4ea; stroke-width: 3.2; stroke-linecap: round; }
+  #inlo .ph-ed { fill: url(#phEyeG); }
+  #inlo .xx { stroke: #fff; stroke-width: 4.5; }
+  #inlo .cheek { opacity: .6; }
+  #inlo .armL { transform-origin: 39.1px 78.5px; }
+  #inlo .armR { transform-origin: 80.8px 74.2px; }
+  #inlo.mood-happy .p, #inlo.mood-sleep .p { opacity: 1; }
+  #inlo.mood-happy .eyes { transform: scaleY(.84) translateY(3px); }
+  #inlo.mood-sleep .eyes { transform: scaleY(.12); }
+  #inlo.mood-sleep .p { opacity: 0; }
 
   #inlo.asm .i-float { animation: none; }
-  #inlo.asm .ph-bot-o { stroke-dasharray: var(--blen); stroke-dashoffset: var(--blen); transition: stroke-dashoffset .7s cubic-bezier(.65,0,.3,1); }
-  #inlo.asm.b-body .ph-bot-o { stroke-dashoffset: 0; }
-  #inlo.asm .ph-bot, #inlo.asm .ph-stripes { clip-path: inset(100% 0 0 0); transition: clip-path 1.25s cubic-bezier(.45,0,.25,1) .15s; }
-  #inlo.asm.b-fill .ph-bot, #inlo.asm.b-fill .ph-stripes { clip-path: inset(0 0 0 0); }
-  #inlo.asm .ph-cap { transform: translateY(-46px) rotate(-14deg); opacity: 0; transform-box: view-box; transform-origin: 61px 60px;
-                      transition: transform .55s cubic-bezier(.3,1.5,.5,1), opacity .25s ease; }
-  #inlo.asm.b-cap .ph-cap { transform: none; opacity: 1; }
-  #inlo.asm .ph-seam { opacity: 0; transition: opacity .2s; }
-  #inlo.asm.b-cap .ph-seam { opacity: 1; }
-  #inlo.asm.b-seal .ph-seam { animation: sealFlash .7s ease 1; }
-  @keyframes sealFlash { 40% { stroke: var(--acc); stroke-width: 6; filter: drop-shadow(0 0 4px var(--acc)); } }
+  #inlo.asm svg { opacity: 0; }
+  #inlo.asm.b-body svg { opacity: 1; }
   #inlo.asm .cheek, #inlo.asm .i-zz { opacity: 0 !important; }
-  #inlo.asm.b-mouth .cheek { opacity: .7 !important; transition: opacity .5s ease; }
-  #inlo.asm .eyes { transform: translateY(14px) scale(0); transition: transform .6s cubic-bezier(.2,1.7,.4,1); }
+  #inlo.asm.b-mouth .cheek { opacity: .6 !important; transition: opacity .5s ease; }
+  #inlo.asm .eyes { transform: translateY(12px) scale(0); transition: transform .62s cubic-bezier(.2,1.7,.4,1); }
   #inlo.asm.b-eyes .eyes { transform: none; }
   #inlo.asm.b-eyes.blink .eyes { transform: scaleY(.1); transition: transform .09s; }
-  #inlo.asm .ph-lash { transform: scaleY(0); transition: transform .55s cubic-bezier(.2,1.9,.4,1) .25s; }
-  #inlo.asm.b-eyes .ph-lash { transform: none; animation: lashFlutter .5s ease .8s 2; }
-  @keyframes lashFlutter { 50% { transform: scaleY(.6); } }
+  #inlo.asm .ph-lash { transform: scale(.2, 0); transition: transform .55s cubic-bezier(.2,1.9,.4,1) .28s; }
+  #inlo.asm.b-eyes .ph-lash { transform: none; animation: lashFlutter .42s ease .85s 2; }
+  @keyframes lashFlutter { 50% { transform: scaleY(.55); } }
   #inlo.asm .m-n { stroke-dasharray: var(--mlen); stroke-dashoffset: var(--mlen); transition: stroke-dashoffset .45s ease; }
   #inlo.asm.b-mouth .m-n { stroke-dashoffset: 0; }
   #inlo.asm .armL, #inlo.asm .armR { animation: none; transform: scale(0); transition: transform .5s cubic-bezier(.2,1.8,.4,1); }
   #inlo.asm.b-arms .armL, #inlo.asm.b-arms .armR { transform: none; }
-  #inlo.asm.b-arms .armR { transition-delay: .12s; }
-  .granule { position: fixed; left: 0; top: 0; z-index: 77; border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 1px rgba(90,42,68,.25), 0 2px 6px rgba(209,73,123,.25); will-change: transform; }
+  #inlo.asm.b-arms .armR { transition-delay: .1s; }
+  .pb-wrap { position: fixed; z-index: 75; pointer-events: auto; cursor: pointer; will-change: transform; }
+  .pb-wrap svg { width: 100%; height: 100%; overflow: visible; display: block; }
+  .pb-wrap.idle { animation: pbIdle 2.8s ease-in-out infinite; }
+  @keyframes pbIdle { 0%,100% { filter: drop-shadow(0 10px 18px rgba(224,82,140,.18)); } 50% { filter: drop-shadow(0 10px 26px rgba(224,82,140,.42)); } }
+  .pb-fly { position: fixed; left: 0; top: 0; z-index: 76; pointer-events: none; will-change: transform; }
+  .pb-fly svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .pill { position: fixed; left: 0; top: 0; z-index: 76; pointer-events: none; will-change: transform, opacity; }
+  .pill svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .pb-shadow { position: fixed; z-index: 74; height: 10px; border-radius: 50%; pointer-events: none; background: radial-gradient(closest-side, rgba(91,44,71,.22), transparent); }
+  .pb-dust { position: fixed; z-index: 76; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; background: color-mix(in srgb, var(--acc) 35%, #fff); }
   .asm-ring { position: fixed; z-index: 76; border-radius: 50%; border: 2px solid; pointer-events: none; }
-  #stEq { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto 6px; height: 40px;
-          font: 700 clamp(19px, 4vw, 26px) 'Dancing Script', 'Fraunces', cursive; color: var(--text); transition: opacity .5s ease, transform .6s ease, filter .5s; }
-  #stEq.done { opacity: 0; transform: translateY(-14px); filter: blur(4px); }
-  #stEq .eq-d { opacity: .35; }
-  #stEq .eq-t { opacity: 0; transform: translateY(8px); filter: blur(5px); transition: opacity .45s ease, transform .55s cubic-bezier(.2,1.4,.4,1), filter .45s; }
-  #stEq .eq-t.on { opacity: 1; transform: none; filter: none; }
-  #stEq .eq-arrow { width: 50px; height: 18px; fill: none; stroke: var(--text); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
-                    stroke-dasharray: 90; stroke-dashoffset: 90; transition: stroke-dashoffset .45s ease; }
-  #stEq.arrow .eq-arrow { stroke-dashoffset: 0; }
-  #stEq .eq-m { color: var(--acc); font-family: 'Fraunces', serif; font-size: .9em; padding: 0 10px; border: 2px solid var(--acc); border-radius: 999px; transform: rotate(-4deg); }
-  #stEq .eq-m.on { transform: rotate(-4deg); text-shadow: 0 0 18px color-mix(in srgb, var(--acc) 45%, transparent); animation: eqStamp .5s cubic-bezier(.2,1.8,.4,1) 1; }
-  @keyframes eqStamp { 0% { transform: scale(2) rotate(-12deg); opacity: 0; } 100% { transform: rotate(-4deg); opacity: 1; } }
-  
-  #inlo.dormant .ghost { opacity: .75; animation: ghostRun 9s linear infinite; }
-  #inlo.dormant svg { cursor: pointer; animation: dormGlow 2.6s ease-in-out infinite; }
-  @keyframes ghostRun { to { stroke-dashoffset: -240; } }
-  @keyframes dormGlow { 0%,100% { filter: drop-shadow(0 0 0 transparent); } 50% { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--acc) 45%, transparent)); } }
   #stWake { position: fixed; inset: 0; z-index: 74; pointer-events: none; transition: opacity .45s ease; }
   #stWake.gone { opacity: 0; }
   #stWake svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
@@ -1612,14 +1514,8 @@ flushPending();
                   white-space: nowrap; padding: 4px 10px; pointer-events: auto; cursor: pointer; opacity: 0; transition: opacity .5s ease 1.5s; }
   #stWake.on .wk-t { opacity: 1; animation: wkBob 1.6s ease-in-out 2s infinite; }
   @keyframes wkBob { 50% { transform: translate(-50%, -5px) rotate(-2deg); } }
-  
-  #inlo.mood-happy .eye-w, #inlo.mood-happy .p { opacity: 1; }
-  #inlo.mood-happy .hap { opacity: 0; }
-  #inlo.mood-happy .eyes { transform: scaleY(.82) translateY(2px); }
-  #inlo.mood-sleep .eye-w { opacity: 1; }
-  #inlo.mood-sleep .clo { opacity: 0; }
-  #inlo.mood-sleep .eyes { transform: scaleY(.12); }
-  #inlo .xx { stroke: #fff; }
+  #inloStage .st-in.shake { animation: stShake .42s cubic-bezier(.36,.07,.19,.97) 1; }
+  @keyframes stShake { 20% { transform: translate(-4px, 2px); } 40% { transform: translate(4px, -2px); } 60% { transform: translate(-3px, 1px); } 80% { transform: translate(2px, 0); } }
   @keyframes iBob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
   @keyframes iArmL { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-10deg); } }
   @keyframes iArmR { 0%,100% { transform: rotate(0); } 50% { transform: rotate(10deg); } }
@@ -1653,49 +1549,50 @@ flushPending();
   <div class="i-tilt"><div class="i-float"><div class="i-act"><div class="i-morph"><div class="i-flip">
     <svg viewBox="0 0 120 150" role="button" aria-label="Phury — study helper">
       <defs>
-        <clipPath id="phCap"><rect x="37" y="16" width="48" height="128" rx="24"/></clipPath>
+        <clipPath id="phCap"><rect x="70" y="80" width="80" height="220" rx="40"/></clipPath>
         <radialGradient id="phEyeG" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#4a4448"/><stop offset=".55" stop-color="#16121a"/><stop offset="1" stop-color="#000"/></radialGradient>
       </defs>
       <g class="armL">
-        <g class="fx prop-paper" transform="rotate(-12 13 50)"><rect x="3" y="36" width="21" height="27" rx="2" fill="#fdfbf3" stroke="var(--text)" stroke-width="2"/><path d="M7 43 H20 M7 47 H20 M7 51 H16 M7 56 H13" stroke="#8a8f99" stroke-width="1.4" stroke-linecap="round"/></g>
-        <path class="ink thin arm-l" d="M38 78 L16 53"/>
-        <circle class="ph-hand" cx="13.5" cy="50" r="5.6"/>
+        <g class="fx prop-paper" transform="rotate(-12 18 53)"><rect x="8" y="39" width="21" height="27" rx="2" fill="#fdfbf3" stroke="var(--text)" stroke-width="1.8"/><path d="M12 46 H25 M12 50 H25 M12 54 H21 M12 59 H18" stroke="#8a8f99" stroke-width="1.3" stroke-linecap="round"/></g>
+        <path class="ph-arm" d="M39.1 78.5 L22.6 58.6"/>
+        <circle class="ph-hand" cx="18.2" cy="53.3" r="5.1"/>
       </g>
       <g class="armR">
-        <path class="ink thin arm-r" d="M84 76 L104 47"/>
-        <circle class="ph-hand" cx="106.5" cy="43.5" r="5.6"/>
-        <g class="fx prop-pen"><path d="M113 28 L102 58" stroke="#d1497b" stroke-width="3.6" stroke-linecap="round"/><path d="M102.6 56.5 L101 61" stroke="#17171b" stroke-width="2" stroke-linecap="round"/><path d="M112 31 L114.5 30" stroke="#fff" stroke-width="1.2" opacity=".7"/></g>
+        <path class="ph-arm" d="M80.8 74.2 L96.7 51.1"/>
+        <circle class="ph-hand" cx="101.1" cy="44.8" r="5.1"/>
+        <g class="fx prop-pen"><path d="M108 29 L97 59" stroke="#e0528c" stroke-width="3.2" stroke-linecap="round"/><path d="M97.6 57.5 L96 62" stroke="#17171b" stroke-width="1.8" stroke-linecap="round"/><path d="M107 32 L109.5 31" stroke="#fff" stroke-width="1.1" opacity=".7"/></g>
       </g>
-      <g class="ph-body">
-        <path class="ph-bot" d="M37 84 Q61 91 85 83 V120 A24 24 0 0 1 37 120 Z"/>
-        <g clip-path="url(#phCap)" class="ph-stripes"><path d="M46 96 L40 102 M58 94 L42 110 M70 93 L44 119 M82 92 L48 126 M86 100 L54 132 M86 112 L62 136 M86 124 L72 138" stroke="#fff" stroke-opacity=".32" stroke-width="1.6"/></g>
-        <path class="ph-bot-o" d="M37 84 V120 A24 24 0 0 0 85 120 V83"/>
-        <g class="ph-cap">
-          <path class="ph-top" d="M37 84 V40 A24 24 0 0 1 85 40 V83 Q61 91 37 84 Z"/>
-          <path class="ph-shine" d="M44 70 V44 A17 17 0 0 1 52 31"/>
+      <g class="ph" transform="translate(1.1 -11.4) scale(.535)">
+        <g class="ph-body">
+          <rect class="ph-fillw" x="70" y="80" width="80" height="220" rx="40"/>
+          <path class="ph-bot" clip-path="url(#phCap)" d="M60 190 Q110 201 160 189 L160 310 L60 310 Z"/>
+          <path clip-path="url(#phCap)" d="M84 215 L74 225 M104 212 L80 236 M124 210 L84 250 M144 208 L88 264 M150 222 L96 276 M150 242 L110 282 M150 262 L126 286" stroke="#fff" stroke-opacity=".3" stroke-width="2.4"/>
+          <path class="ph-seam" clip-path="url(#phCap)" d="M60 190 Q110 201 160 189"/>
+          <rect class="ph-out" x="70" y="80" width="80" height="220" rx="40"/>
         </g>
-        <path class="ph-seam" d="M37 84 Q61 91 85 83"/>
-        <path class="ghost" d="M37 84 V40 A24 24 0 0 1 85 40 V120 A24 24 0 0 1 37 120 Z M37 84 Q61 91 85 83"/>
-      </g>
-      <ellipse class="fx cheek" cx="44.5" cy="50" rx="5.2" ry="2.9" fill="#ff8fb5"/>
-      <ellipse class="fx cheek" cx="77.5" cy="50" rx="5.2" ry="2.9" fill="#ff8fb5"/>
-      <path class="fx ink thin m-n" d="M53 53 Q61 61 69 53"/>
-      <path class="fx ink thin m-h" d="M52 52 Q61 64 70 52 Z" style="fill:#7a1238"/>
-      <path class="fx ink thin m-s" d="M54 58 Q61 52 68 58"/>
-      <ellipse class="fx ink thin m-o" cx="61" cy="56" rx="3.2" ry="4"/>
-      <path class="fx ink thin brow" d="M39 9 L54 5 M83 9 L68 5"/>
-      <path class="fx ink thin brow-st" d="M40 5 L55 9.5 M82 5 L67 9.5"/>
-      <path class="fx ink thin m-f" d="M54 56 L68 56"/>
-      <g class="eyes">
-        <g class="ph-lash"><g transform="translate(48 24) scale(-.6 .6)"><path d="M9 -19 Q25 -19.5 36 -29.5 Q35.5 -26.5 33 -24 Q23 -14 12 -14.5 Z"/><path d="M13 -16 Q34 -13.5 50 -30.5 Q50 -27 47.5 -24 Q34 -9 17 -10.5 Z"/></g>
-          <g transform="translate(74 24) scale(.6)"><path d="M9 -19 Q25 -19.5 36 -29.5 Q35.5 -26.5 33 -24 Q23 -14 12 -14.5 Z"/><path d="M13 -16 Q34 -13.5 50 -30.5 Q50 -27 47.5 -24 Q34 -9 17 -10.5 Z"/></g></g>
-        <circle class="fx eye-w" cx="48" cy="24" r="13.2"/><circle class="fx eye-w" cx="74" cy="24" r="13.2"/>
-        <g class="fx p"><circle cx="45" cy="19.5" r="5.4" fill="#fff"/><ellipse cx="52.2" cy="28" rx="2.8" ry="2" fill="#fff" transform="rotate(-20 52.2 28)"/></g>
-        <g class="fx p"><circle cx="71" cy="19.5" r="5.4" fill="#fff"/><ellipse cx="78.2" cy="28" rx="2.8" ry="2" fill="#fff" transform="rotate(-20 78.2 28)"/></g>
-        <path class="fx dk hl" d=""/>
-        <path class="fx ink hap" d="M37 28 Q48 15 59 28 M63 28 Q74 15 85 28"/>
-        <path class="fx ink clo" d="M36 23 Q48 32 60 23 M62 23 Q74 32 86 23"/>
-        <path class="fx dk xx" d="M42 18 L54 30 M54 18 L42 30 M68 18 L80 30 M80 18 L68 30"/>
+        <ellipse class="fx cheek" cx="86" cy="121" rx="9" ry="5" fill="#ff8fb5"/>
+        <ellipse class="fx cheek" cx="137" cy="120" rx="9" ry="5" fill="#ff8fb5"/>
+        <path class="fx ph-ln m-n" d="M95 128 Q111 142 128 127"/>
+        <path class="fx ph-ln m-h" d="M94 126 Q111 147 129 125 Q111 133 94 126 Z" style="fill:#7a1238"/>
+        <path class="fx ph-ln m-s" d="M96 136 Q111 126 127 135"/>
+        <ellipse class="fx ph-ln m-o" cx="111" cy="131" rx="7" ry="8.5" style="fill:#7a1238"/>
+        <path class="fx ph-ln brow" d="M70 58 L97 49 M152 56 L125 47"/>
+        <path class="fx ph-ln brow-st" d="M70 49 L97 58 M152 47 L125 56"/>
+        <path class="fx ph-ln m-f" d="M98 132 L125 132"/>
+        <g class="eyes">
+          <g transform="translate(87 82)">
+            <g transform="scale(-1 1)" class="ph-lash"><path d="M9 -19 Q25 -19.5 36 -29.5 Q35.5 -26.5 33 -24 Q23 -14 12 -14.5 Z"/><path d="M13 -16 Q34 -13.5 50 -30.5 Q50 -27 47.5 -24 Q34 -9 17 -10.5 Z"/></g>
+            <circle class="ph-ew" r="22"/><path class="ph-rim" d="M-19 6 Q0 24 19 6"/><circle class="ph-ed" cy="-2.2" r="19"/>
+            <g class="fx p"><circle cx="-5" cy="-8" r="9" fill="#fff"/><ellipse cx="7" cy="6.5" rx="4.6" ry="3.4" fill="#fff" transform="rotate(-20 7 6.5)"/></g>
+          </g>
+          <g transform="translate(135 80)">
+            <g class="ph-lash"><path d="M9 -19 Q25 -19.5 36 -29.5 Q35.5 -26.5 33 -24 Q23 -14 12 -14.5 Z"/><path d="M13 -16 Q34 -13.5 50 -30.5 Q50 -27 47.5 -24 Q34 -9 17 -10.5 Z"/></g>
+            <circle class="ph-ew" r="22"/><path class="ph-rim" d="M-19 6 Q0 24 19 6"/><circle class="ph-ed" cy="-2.2" r="19"/>
+            <g class="fx p"><circle cx="-5" cy="-8" r="9" fill="#fff"/><ellipse cx="7" cy="6.5" rx="4.6" ry="3.4" fill="#fff" transform="rotate(-20 7 6.5)"/></g>
+          </g>
+          <path class="fx dk xx" d="M79 74 L95 90 M95 74 L79 90 M127 72 L143 88 M143 72 L127 88"/>
+          <path class="fx hl hap clo" d=""/>
+        </g>
       </g>
       <g class="glasses"></g>
     </svg>
@@ -1850,7 +1747,7 @@ flushPending();
     if (st.look && st.look.until > now() && st.look.el.isConnected) { const r = st.look.el.getBoundingClientRect(); tx = r.left + r.width / 2; ty = r.top + r.height / 2; }
     const r = SVG.getBoundingClientRect(), k = r.width / 120, flip = IN.classList.contains('left'), sad = IN.classList.contains('mood-sad');
     [48, 74].forEach((vx, i) => {
-      const cx = r.left + (flip ? 120 - vx : vx) * k, cy = r.top + 24 * k;
+      const cx = r.left + (flip ? 120 - vx : vx) * k, cy = r.top + 32 * k;
       let dx = tx - cx, dy = ty - cy; const d = Math.hypot(dx, dy) || 1, f = Math.min(1, d / 140) * 4.6;
       dx = dx / d * f; dy = dy / d * f; if (flip) dx = -dx; if (sad) { dx *= .3; dy = 3.5; }
       const p = st.pup[i]; p[0] += (dx - p[0]) * .18; p[1] += (dy - p[1]) * .18;
@@ -2171,7 +2068,7 @@ flushPending();
     st.spotEl = spot; act('jump', 700); lookAt($('attPaper'), 2500);
     IN.classList.add('handing'); sfx('paper');
     const paper = $('attPaper'), hr = SVG.getBoundingClientRect(), pr = paper.getBoundingClientRect();
-    const hx = hr.left + hr.width * .11, hy = hr.top + hr.height * .33;
+    const hx = hr.left + hr.width * .15, hy = hr.top + hr.height * .355;
     paper.animate([
       { opacity: 0, transform: `translate(${hx - (pr.left + pr.width / 2)}px, ${hy - (pr.top + pr.height / 2)}px) scale(.12) rotate(-24deg)` },
       { opacity: 1, offset: .35 },
@@ -2207,7 +2104,7 @@ flushPending();
   async function closeAtt() {
     const ov = $('inloAtt'); if (!ov) return;
     const paper = $('attPaper'), hr = SVG.getBoundingClientRect(), pr = paper.getBoundingClientRect();
-    const hx = hr.left + hr.width * .11, hy = hr.top + hr.height * .33;
+    const hx = hr.left + hr.width * .15, hy = hr.top + hr.height * .355;
     paper.animate([{ opacity: 1, transform: 'translate(0,0) scale(1) rotate(-1.2deg)' },
       { opacity: 0, transform: `translate(${hx - (pr.left + pr.width / 2)}px, ${hy - (pr.top + pr.height / 2)}px) scale(.12) rotate(-24deg)` }],
       { duration: 650, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' });
@@ -2245,11 +2142,13 @@ flushPending();
     }
   }, 1000);
 
-  const ASM_CLS = ['asm', 'b-body', 'b-fill', 'b-cap', 'b-seal', 'b-eyes', 'b-mouth', 'b-arms'];
+  const ASM_CLS = ['asm', 'b-body', 'b-eyes', 'b-mouth', 'b-arms'];
   function asmCleanup() {
     IN.classList.remove(...ASM_CLS);
     IN.classList.remove('dormant'); if (st.wake) st.wake();
-    document.querySelectorAll('.granule, .asm-ring, #stEq, #stWake').forEach(el => el.remove());
+    if (st.spill) { st.spill.stop(); st.spill = null; }
+    document.querySelectorAll('.pb-wrap, .pb-fly, .pill, .pb-shadow, .pb-dust, .asm-ring, #stWake').forEach(el => el.remove());
+    $('inloStage')?.querySelector('.st-in')?.classList.remove('shake');
   }
   function asmRing(x, y, size, col, dur = 900, delay = 0) {
     const r = document.createElement('div'); r.className = 'asm-ring';
@@ -2261,48 +2160,62 @@ flushPending();
   function microSparks(x, y, col, n = 9, set = ['✦', '·', '✧', '♡']) {
     for (let i = 0; i < n; i++) {
       const p = document.createElement('span'); p.className = 'i-spark'; p.textContent = pickOne(set); p.style.color = col;
-      p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.fontSize = 8 + Math.random() * 8 + 'px'; document.body.appendChild(p);
-      const a = Math.random() * Math.PI * 2, d = 16 + Math.random() * 30;
+      p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.fontSize = 8 + Math.random() * 9 + 'px'; document.body.appendChild(p);
+      const a = Math.random() * Math.PI * 2, d = 18 + Math.random() * 34;
       p.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
                  { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(0)`, opacity: 0 }],
-        { duration: 500 + Math.random() * 300, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => p.remove();
+        { duration: 520 + Math.random() * 320, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => p.remove();
     }
   }
-  const acc = () => getComputedStyle(document.body).getPropertyValue('--acc').trim() || '#d1497b';
-  const vb = (x, y) => { const r = SVG.getBoundingClientRect(), k = r.width / 120; return { x: r.left + x * k, y: r.top + y * k, k }; };
-  function pourGranules(T) {
-    const top = vb(61, 84), bot = vb(61, 132), cols = ['#ff8fb5', '#f7c6d9', '#c9a7f2', '#ffd6e5', '#ffffff', '#e86a9a'];
-    const n = 22, jobs = [];
+  function dust(x, y, k, n = 10) {
     for (let i = 0; i < n; i++) {
-      jobs.push(new Promise(res => {
-        const g = document.createElement('div'); g.className = 'granule';
-        const sz = 5 + Math.random() * 5; g.style.width = g.style.height = sz + 'px'; g.style.background = pickOne(cols);
-        document.body.appendChild(g);
-        const x0 = top.x + (Math.random() - .5) * 26 * top.k, y0 = top.y - 120 - Math.random() * 60;
-        const x1 = top.x + (Math.random() - .5) * 34 * top.k, y1 = bot.y - Math.random() * (bot.y - top.y) * .8;
-        g.animate([{ transform: `translate(${x0}px, ${y0}px) scale(.6)`, opacity: 0 }, { opacity: 1, offset: .2 },
-                   { transform: `translate(${x1}px, ${y1}px) scale(1)`, opacity: 1 }],
-          { duration: (520 + Math.random() * 260) * T, delay: i * 38 * T, easing: 'cubic-bezier(.5,0,.75,.4)', fill: 'forwards' }).onfinish = () => {
-          g.animate([{ opacity: 1 }, { opacity: 0, transform: `translate(${x1}px, ${y1}px) scale(.3)` }], { duration: 260, fill: 'forwards' }).onfinish = () => { g.remove(); res(); };
-        };
-      }));
+      const d = document.createElement('div'); d.className = 'pb-dust'; document.body.appendChild(d);
+      const dir = i % 2 ? 1 : -1, dx = dir * (20 + Math.random() * 46) * k, dy = -(6 + Math.random() * 22) * k, s = .6 + Math.random() * 1.2;
+      d.animate([{ transform: `translate(${x}px, ${y}px) scale(${s})`, opacity: .9 }, { transform: `translate(${x + dx}px, ${y + dy}px) scale(${s * 2.2})`, opacity: 0 }],
+        { duration: 520 + Math.random() * 300, easing: 'cubic-bezier(.1,.7,.3,1)' }).onfinish = () => d.remove();
     }
-    return Promise.all(jobs);
   }
-  function wakeHint() {
+  const acc = () => getComputedStyle(document.body).getPropertyValue('--acc').trim() || '#e0528c';
+  const INK = '#5b2c47';
+  const CAPS = [['#ffffff', '#f6a5c3'], ['#f6a5c3', '#c9a7f2'], ['#ffffff', '#c9a7f2'], ['#ffd6e5', '#e86a9a'], ['#ffffff', '#ffb3cf']];
+  const capSvg = ([a, b]) => `<svg viewBox="0 0 48 20"><rect x="1.5" y="1.5" width="45" height="17" rx="8.5" fill="${a}"/><path d="M24 1.5 H38 A8.5 8.5 0 0 1 38 18.5 H24 Z" fill="${b}"/>`
+    + `<rect x="1.5" y="1.5" width="45" height="17" rx="8.5" fill="none" stroke="${INK}" stroke-width="2"/><path d="M24 1.5 V18.5" stroke="${INK}" stroke-width="1.6"/><path d="M7 6 H17" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".75"/></svg>`;
+  const HERO_SVG = `<svg viewBox="66 76 88 228"><rect x="70" y="80" width="80" height="220" rx="40" fill="#fff"/>`
+    + `<path clip-path="url(#phCapH)" d="M60 190 Q110 201 160 189 L160 310 L60 310 Z" fill="#f6a5c3"/><defs><clipPath id="phCapH"><rect x="70" y="80" width="80" height="220" rx="40"/></clipPath></defs>`
+    + `<path clip-path="url(#phCapH)" d="M60 190 Q110 201 160 189" fill="none" stroke="${INK}" stroke-width="4.6"/><rect x="70" y="80" width="80" height="220" rx="40" fill="none" stroke="${INK}" stroke-width="4.6"/>`
+    + `<path d="M84 110 V170" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".0"/></svg>`;
+  const BOTTLE_SVG = `<svg viewBox="0 0 100 168">
+      <g class="pb-body">
+        <path d="M30 26 H70 V36 Q88 38 88 56 V150 Q88 164 74 164 H26 Q12 164 12 150 V56 Q12 38 30 36 Z" fill="rgba(246,165,195,.55)" stroke="${INK}" stroke-width="2.8" stroke-linejoin="round"/>
+        <g opacity=".95"><g transform="translate(22 128) rotate(-18)">${capSvg(CAPS[0]).replace('<svg viewBox="0 0 48 20">', '<svg x="0" y="0" width="30" height="12.5" viewBox="0 0 48 20">')}</g>
+          <g transform="translate(50 136) rotate(12)">${capSvg(CAPS[1]).replace('<svg viewBox="0 0 48 20">', '<svg x="0" y="0" width="30" height="12.5" viewBox="0 0 48 20">')}</g>
+          <g transform="translate(30 146) rotate(4)">${capSvg(CAPS[3]).replace('<svg viewBox="0 0 48 20">', '<svg x="0" y="0" width="30" height="12.5" viewBox="0 0 48 20">')}</g>
+          <g transform="translate(58 118) rotate(-30)">${capSvg(CAPS[2]).replace('<svg viewBox="0 0 48 20">', '<svg x="0" y="0" width="30" height="12.5" viewBox="0 0 48 20">')}</g></g>
+        <rect x="19" y="62" width="62" height="50" rx="7" fill="#fff" stroke="${INK}" stroke-width="2.2"/>
+        <text x="31" y="90" font-family="Dancing Script, Fraunces, serif" font-weight="700" font-size="22" fill="#e0528c">Rx</text>
+        <g transform="translate(57 77) rotate(-30)"><rect x="0" y="0" width="18" height="8" rx="4" fill="#fff" stroke="#e0528c" stroke-width="1.6"/><path d="M9 0 H14 A4 4 0 0 1 14 8 H9 Z" fill="#e0528c"/></g>
+        <path d="M27 98 H73 M27 104 H60" stroke="#e7c3d2" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M21 50 Q20 70 20 120" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none" opacity=".7"/>
+      </g>
+      <g class="pb-cap"><rect x="24" y="2" width="52" height="26" rx="6" fill="#fff" stroke="${INK}" stroke-width="2.8"/>
+        <path d="M33 6 V24 M41 6 V24 M49 6 V24 M57 6 V24 M65 6 V24" stroke="#f0c9d8" stroke-width="2.2" stroke-linecap="round"/></g>
+    </svg>`;
+  const CAP_ONLY = `<svg viewBox="22 0 56 30"><rect x="24" y="2" width="52" height="26" rx="6" fill="#fff" stroke="${INK}" stroke-width="2.8"/><path d="M33 6 V24 M41 6 V24 M49 6 V24 M57 6 V24 M65 6 V24" stroke="#f0c9d8" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+
+  function wakeHint(target) {
     const box = document.createElement('div'); box.id = 'stWake';
-    box.innerHTML = '<svg><path class="wk-c"/><path class="wk-a"/><path class="wk-h"/></svg><div class="wk-t">صحّي <span dir="ltr">Phury</span> 💊</div>';
+    box.innerHTML = '<svg><path class="wk-c"/><path class="wk-a"/><path class="wk-h"/></svg><div class="wk-t">دوسي على العلبة 💊</div>';
     document.body.appendChild(box);
     const svg = box.querySelector('svg'), lab = box.querySelector('.wk-t');
     function layout() {
-      const r = $('stSpot').getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .5, rx = r.width * .62, ry = r.height * .66;
+      const r = target.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .52, rx = r.width * .95, ry = r.height * .68;
       let d = '';
       for (let i = 0; i <= 64; i++) {
         const t = -2 + i / 64 * (Math.PI * 2 + .55), w = 1 + Math.sin(i * .8) * .025 + i / 64 * .05;
         d += (i ? ' L' : 'M') + (cx + Math.cos(t) * rx * w).toFixed(1) + ' ' + (cy + Math.sin(t) * ry * w).toFixed(1);
       }
       svg.querySelector('.wk-c').setAttribute('d', d);
-      const lx = Math.min(innerWidth - 80, cx + rx * 1.15), ly = cy + ry * 1.12;
+      const lx = Math.min(innerWidth - 90, cx + rx * 1.25), ly = cy + ry * 1.05;
       lab.style.left = lx + 'px'; lab.style.top = ly + 'px';
       const sx = lx - 4, sy = ly - 6, ex = cx + rx * Math.cos(.7) * 1.08, ey = cy + ry * Math.sin(.7) * 1.08;
       const qx = Math.max(sx, ex) + 34, qy = (sy + ey) / 2 + 12;
@@ -2314,46 +2227,140 @@ flushPending();
     requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('on')));
     return { label: lab, hide() { removeEventListener('resize', layout); box.classList.add('gone'); setTimeout(() => box.remove(), 500); } };
   }
+
+  function spillEngine(floor, k) {
+    const pills = []; let raf = 0, last = 0, alive = true;
+    const G = 2500 * k, W = innerWidth;
+    function add(x, y, dirX) {
+      const w = (24 + Math.random() * 9) * k, h = w * .42, el = document.createElement('div'); el.className = 'pill';
+      el.style.width = w + 'px'; el.style.height = h + 'px'; el.innerHTML = capSvg(pickOne(CAPS)); document.body.appendChild(el);
+      pills.push({ el, w, h, x, y: y + (Math.random() - .5) * 10 * k, vx: dirX * (180 + Math.random() * 560) * k, vy: -(60 + Math.random() * 420) * k,
+                   rot: (Math.random() - .5) * 50, vr: (Math.random() - .5) * 1100, ground: false });
+    }
+    function tick(t) {
+      if (!alive) return;
+      const dt = Math.min(.033, last ? (t - last) / 1000 : .016); last = t;
+      for (const p of pills) {
+        p.vy += G * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        if (p.y + p.h / 2 >= floor) {
+          p.y = floor - p.h / 2;
+          if (p.vy > 0) { if (p.vy > 140 * k) { p.vy = -p.vy * .36; p.vx *= .8; p.vr *= .5; } else { p.vy = 0; p.ground = true; } }
+        }
+        if (p.ground) { p.vx *= Math.max(0, 1 - 2.6 * dt); const tg = Math.round(p.rot / 180) * 180; p.rot += (tg - p.rot) * Math.min(1, 9 * dt); p.vr = 0; }
+        else p.rot += p.vr * dt;
+        if (p.x < p.w / 2) { p.x = p.w / 2; p.vx = Math.abs(p.vx) * .55; }
+        if (p.x > W - p.w / 2) { p.x = W - p.w / 2; p.vx = -Math.abs(p.vx) * .55; }
+        p.el.style.transform = `translate(${(p.x - p.w / 2).toFixed(1)}px, ${(p.y - p.h / 2).toFixed(1)}px) rotate(${p.rot.toFixed(1)}deg)`;
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+    return { add, pills, stop() { alive = false; cancelAnimationFrame(raf); },
+             fade(ms = 600) { pills.forEach((p, i) => p.el.animate([{ opacity: 1 }, { opacity: 0, transform: p.el.style.transform + ' scale(.6)' }], { duration: ms, delay: i * 18, fill: 'forwards' })); } };
+  }
+
   async function assemble(fast) {
-    const T = fast ? .72 : 1, W = (ms) => wait(ms * T);
-    const outl = SVG.querySelector('.ph-bot-o'), mouth = SVG.querySelector('.m-n');
-    outl.style.setProperty('--blen', outl.getTotalLength().toFixed(1)); mouth.style.setProperty('--mlen', mouth.getTotalLength().toFixed(1));
+    const T = fast ? .8 : 1, W = (ms) => wait(ms * T);
+    const mouth = SVG.querySelector('.m-n'); mouth.style.setProperty('--mlen', mouth.getTotalLength().toFixed(1));
     IN.classList.add('asm', 'dormant'); IN.classList.remove('away');
-    const wk = wakeHint();
+    await wait(80);
+    const B = SVG.querySelector('.ph-out').getBoundingClientRect();
+    const F = B.bottom, k = B.height / 160, Cx = B.left + B.width / 2, Cy = B.top + B.height / 2;
+    const bh = B.height * .98, bw = bh / 1.68, bx = Cx - bw / 2, by = F - bh;
+    const wrap = document.createElement('div'); wrap.className = 'pb-wrap idle'; wrap.innerHTML = BOTTLE_SVG;
+    Object.assign(wrap.style, { left: bx + 'px', top: by + 'px', width: bw + 'px', height: bh + 'px', transformOrigin: '0% 100%' });
+    document.body.appendChild(wrap);
+    const sh = document.createElement('div'); sh.className = 'pb-shadow';
+    Object.assign(sh.style, { left: bx - bw * .1 + 'px', top: F - 5 + 'px', width: bw * 1.2 + 'px' }); document.body.appendChild(sh);
+    wrap.animate([{ transform: 'translateY(-26px) scale(.9)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.2,1.5,.4,1)' });
+    const wk = wakeHint(wrap);
+    let tapX = Cx, tapY = Cy;
     await new Promise(res => {
-      const go = (e) => { if (e && e.type === 'keydown' && !['Enter', ' '].includes(e.key)) return; cleanup(); res(); };
-      const cleanup = () => { IN.removeEventListener('click', go); wk.label.removeEventListener('click', go); $('stSpot').removeEventListener('click', go); removeEventListener('keydown', go); st.wake = null; };
-      IN.addEventListener('click', go); wk.label.addEventListener('click', go); $('stSpot').addEventListener('click', go); addEventListener('keydown', go);
+      const go = (e) => { if (e && e.type === 'keydown' && !['Enter', ' '].includes(e.key)) return; if (e && e.clientX) { tapX = e.clientX; tapY = e.clientY; } cleanup(); res(); };
+      const cleanup = () => { [IN, wk.label, $('stSpot'), wrap].forEach(el => el.removeEventListener('click', go)); removeEventListener('keydown', go); st.wake = null; };
+      [IN, wk.label, $('stSpot'), wrap].forEach(el => el.addEventListener('click', go)); addEventListener('keydown', go);
       st.wake = () => { cleanup(); res(); };
     });
     wk.hide();
     if (!st.stage || st.leaving) return;
-    IN.classList.remove('dormant');
+    IN.classList.remove('dormant'); wrap.classList.remove('idle');
     const c = acc();
-    { const p = vb(61, 80); asmRing(p.x, p.y, 120 * p.k, c, 700); microSparks(p.x, p.y, c, 14); }
-    const eq = document.createElement('div'); eq.id = 'stEq'; eq.setAttribute('dir', 'ltr');
-    eq.innerHTML = '<span class="eq-t" data-k="f">Fill</span><span class="eq-d">·</span><span class="eq-t" data-k="c">Cap</span><span class="eq-d">·</span><span class="eq-t" data-k="s">Seal</span>'
-      + '<svg class="eq-arrow" viewBox="0 0 64 20"><path d="M3 10 H56 M47 3 L58 10 L47 17"/></svg><span class="eq-t eq-m" data-k="m">QC ✓</span>';
-    STAGE.querySelector('.st-in').insertBefore(eq, $('stSpot'));
-    const on = (k) => eq.querySelector(`[data-k="${k}"]`).classList.add('on');
-    await W(250); if (!st.stage || st.leaving) return;
-    sfx('chime'); IN.classList.add('b-body'); on('f');
-    await W(700); if (!st.stage || st.leaving) return;
-    IN.classList.add('b-fill'); await pourGranules(T);
-    if (!st.stage || st.leaving) return;
-    sfx('whoosh'); on('c'); IN.classList.add('b-cap'); await W(520);
-    if (!st.stage || st.leaving) return;
-    sfx('pop'); { const p = vb(61, 86); asmRing(p.x, p.y, 70 * p.k, c, 600); microSparks(p.x, p.y, c, 10); }
-    IN.classList.add('b-seal'); on('s'); await W(380);
-    eq.classList.add('arrow'); await W(380); on('m'); sfx('streak'); await W(480);
-    if (!st.stage || st.leaving) return;
-    sfx('magic'); burst(''); IN.classList.add('b-eyes'); await W(520);
+    asmRing(tapX, tapY, 60 * k, c, 500); sfx('whoosh');
+    const FALL = 1150 * T, HIT = .6;
+    wrap.animate([
+      { transform: 'none', easing: 'cubic-bezier(.3,0,.4,1)' },
+      { transform: 'scale(1.05, .92)', offset: .12, easing: 'cubic-bezier(.3,0,.4,1)' },
+      { transform: 'rotate(-6deg) scale(.98, 1.03)', offset: .24, easing: 'cubic-bezier(.55,0,.9,.55)' },
+      { transform: 'rotate(-90deg)', offset: HIT, easing: 'cubic-bezier(.2,.7,.4,1)' },
+      { transform: 'rotate(-81deg)', offset: .72, easing: 'cubic-bezier(.6,0,.9,.6)' },
+      { transform: 'rotate(-90deg)', offset: .84, easing: 'cubic-bezier(.2,.7,.4,1)' },
+      { transform: 'rotate(-87deg)', offset: .92 },
+      { transform: 'rotate(-90deg)' }
+    ], { duration: FALL, fill: 'forwards' });
+    sh.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${-bh * .45}px) scaleX(${bh / bw * .9})`, opacity: .8 }], { duration: FALL * HIT, delay: FALL * .24, easing: 'cubic-bezier(.55,0,.9,.55)', fill: 'forwards' });
+    await W(FALL * HIT); if (!st.stage || st.leaving) return;
+    sfx('pop'); STAGE.querySelector('.st-in')?.classList.add('shake');
+    dust(bx - bh * .5, F - 2, k, 14);
+    const mx = bx - bh * (1 - 26 / 168), my = F - bw / 2;
+    { // the cap pops off and tumbles away
+      const capEl = wrap.querySelector('.pb-cap'), cr = capEl.getBoundingClientRect(); capEl.style.opacity = '0';
+      const fw = bw * .56, fh = bh * .155, fly = document.createElement('div'); fly.className = 'pb-fly'; fly.innerHTML = CAP_ONLY;
+      Object.assign(fly.style, { width: fw + 'px', height: fh + 'px' }); document.body.appendChild(fly);
+      const x0 = cr.left + cr.width / 2 - fw / 2, y0 = cr.top + cr.height / 2 - fh / 2, gx = Math.max(6, x0 - 120 * k), gy = F - fh * .5 - fw / 2;
+      fly.animate([
+        { transform: `translate(${x0}px, ${y0}px) rotate(-90deg)`, easing: 'cubic-bezier(.2,.6,.4,1)' },
+        { transform: `translate(${x0 - 60 * k}px, ${y0 - 90 * k}px) rotate(-300deg)`, offset: .35, easing: 'cubic-bezier(.5,0,.8,.4)' },
+        { transform: `translate(${gx}px, ${gy}px) rotate(-450deg)`, offset: .7, easing: 'cubic-bezier(.2,.6,.4,1)' },
+        { transform: `translate(${gx - 10 * k}px, ${gy - 16 * k}px) rotate(-470deg)`, offset: .82, easing: 'cubic-bezier(.5,0,.8,.4)' },
+        { transform: `translate(${gx - 16 * k}px, ${gy}px) rotate(-450deg)` }
+      ], { duration: 1100 * T, fill: 'forwards' });
+      microSparks(mx, my, c, 10);
+    }
+    const eng = spillEngine(F, k); st.spill = eng;
+    for (let i = 0; i < 6; i++) eng.add(mx, my, -1);
+    let n = 0; const pour = setInterval(() => { if (!st.spill || n++ > 12) return clearInterval(pour); eng.add(mx, my, Math.random() < .85 ? -1 : 1); if (n % 3 === 0) sfx('pop'); }, 55 * T);
+    await W(240); if (!st.stage || st.leaving) return;
+    const hero = document.createElement('div'); hero.className = 'pill'; hero.style.zIndex = 78; hero.innerHTML = HERO_SVG;
+    Object.assign(hero.style, { left: B.left + 'px', top: B.top + 'px', width: B.width + 'px', height: B.height + 'px', transformOrigin: '50% 50%' });
+    document.body.appendChild(hero);
+    const hw = B.width, hh = B.height, S1 = .5, L = F - hw * S1 / 2 - Cy, ox = mx - Cx, oy = my - Cy;
+    const X1 = Math.max(-Cx + hh * S1 / 2 + 10, ox - 105 * k), X2 = Math.max(-Cx + hh * S1 / 2 + 6, X1 - 14 * k);
+    const tf = (x, y, r, sx = 1, sy = sx) => `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${r}deg) scale(${sx}, ${sy})`;
+    const UP = 'cubic-bezier(.2,.6,.4,1)', DOWN = 'cubic-bezier(.55,0,.85,.45)', SOFT = 'cubic-bezier(.4,0,.2,1)';
+    const HERO = 3300 * T;
+    hero.animate([
+      { transform: tf(ox + 8 * k, oy, -90, .28), opacity: 0, easing: UP },
+      { transform: tf(ox - 26 * k, oy - 52 * k, -170, S1), opacity: 1, offset: .1, easing: DOWN },
+      { transform: tf(X1, L, -270, S1), offset: .21, easing: SOFT },
+      { transform: tf(X1, L, -270, S1 * 1.04, S1 * .9), offset: .24, easing: UP },
+      { transform: tf(X1 - 8 * k, L - 20 * k, -278, S1), offset: .29, easing: DOWN },
+      { transform: tf(X2, L, -270, S1), offset: .34, easing: SOFT },
+      { transform: tf(X2, L, -270, S1), offset: .52, easing: SOFT },
+      { transform: tf(X2 + 3 * k, L, -262, S1 * 1.03, S1 * .94), offset: .58, easing: UP },
+      { transform: tf(X2 / 2, -112 * k, -135, .82), offset: .76, easing: DOWN },
+      { transform: tf(0, 0, 0, 1.1, .86), offset: .9, easing: UP },
+      { transform: tf(0, -6 * k, 0, .95, 1.07), offset: .95, easing: SOFT },
+      { transform: tf(0, 0, 0) }
+    ], { duration: HERO, fill: 'forwards' });
+    setTimeout(() => sfx('pop'), HERO * .21);
+    setTimeout(() => { if (!st.stage) return;
+      const r = wrap.getBoundingClientRect(); microSparks(r.left + r.width / 2, r.top + r.height / 2, c, 16); asmRing(r.left + r.width / 2, r.top + r.height / 2, r.width * 1.1, c, 700);
+      wrap.animate([{ opacity: 1, transform: 'rotate(-90deg)' }, { opacity: 0, transform: 'rotate(-90deg) scale(.4)' }], { duration: 420, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' });
+      sh.animate([{ opacity: .8 }, { opacity: 0 }], { duration: 400, fill: 'forwards' }); sfx('streak');
+    }, HERO * .4);
+    setTimeout(() => sfx('whoosh'), HERO * .58);
+    await wait(HERO * .9); if (!st.stage || st.leaving) return;
+    sfx('pop'); dust(Cx, F - 2, k, 12);
+    await wait(HERO * .1 + 30); if (!st.stage || st.leaving) return;
+    IN.classList.add('b-body'); hero.remove();
+    eng.fade(700);
+    await W(120);
+    sfx('magic'); burst('girl'); IN.classList.add('b-eyes'); await W(520);
     IN.classList.add('b-mouth'); await W(240);
     IN.classList.add('blink'); setTimeout(() => IN.classList.remove('blink'), 130);
     setTimeout(() => { IN.classList.add('blink'); setTimeout(() => IN.classList.remove('blink'), 120); }, 300);
-    IN.classList.add('b-arms'); await W(560);
-    eq.classList.add('done'); asmCleanup();
-    setTimeout(() => eq.remove(), 600);
+    IN.classList.add('b-arms'); await W(620);
+    asmCleanup();
   }
 
   function words(el, html, delay = 0) {
