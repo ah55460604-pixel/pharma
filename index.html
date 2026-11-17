@@ -1194,7 +1194,7 @@ function finishExam() {
   SFX.play(pct >= 85 ? 'fanfare' : 'done');
   if (window.inloEvt) inloEvt('finish', { pct, wrong: wrong.length, retry: exam.isRetry });
   if (pct === 100) confetti(fullBank ? 90 : 45);
-  if (!exam.isRetry) saveResult({ studentName: SID, ...(setup.name ? { name: setup.name.slice(0, 40) } : {}), gender: setup.gender || 'none', scope: setup.mode === 'sim' ? 'SIM' : setup.scope, scopeLabel: modeLabel,
+  if (!exam.isRetry) saveResult({ studentName: SID, gender: setup.gender || 'none', scope: setup.mode === 'sim' ? 'SIM' : setup.scope, scopeLabel: modeLabel,
     difficulty: (setup.mode === 'custom' || setup.mode === 'mcq' || setup.mode === 'qb') ? setup.diff : 'mixed', score: exam.score, total, percentage: pct, durationSec: dur });
 }
 $('retryWrongBtn').onclick = () => { if (exam && exam.wrong && exam.wrong.length) startExam(exam.wrong); };
